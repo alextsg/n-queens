@@ -33,17 +33,15 @@ window.findNRooksSolution = function(boardSize) {
 
     var row = num - numOfTimes;
     for (var col = 0; col < num; col++) {
-      if (board.rows()[row][col] === 0) {
         board.togglePiece(row, col);
-        if (board.hasAnyRowConflicts() || board.hasAnyColConflicts()){
+      if (board.hasRowConflictAt(row) || board.hasColConflictAt(col)){
+        board.togglePiece(row, col);
+      } else {
+        if (toggle) {
+          search(board, numOfTimes - 1);
           board.togglePiece(row, col);
         } else {
-          if (toggle) {
-            search(board, numOfTimes - 1);
-            board.togglePiece(row, col);
-          } else {
-            return;
-          }
+          return;
         }
       }
     }
@@ -68,18 +66,14 @@ window.countNRooksSolutions = function(boardSize) {
 
     var row = num - numOfTimes;
     for (var col = 0; col < num; col++) {
-      if (board.rows()[row][col] === 0) {
-        board.togglePiece(row, col);
-        if (board.hasAnyRowConflicts() || board.hasAnyColConflicts()){
-          board.togglePiece(row, col);
-        } else {
-          search(board, numOfTimes - 1);
-          board.togglePiece(row, col);
-        }
+      board.togglePiece(row, col);
+      if (!board.hasRowConflictAt(row) && !board.hasColConflictAt(col)){
+        search(board, numOfTimes - 1);
       }
+      board.togglePiece(row, col);
     }
-  };
 
+  };
   search(board, num);
   return counter;
 };
@@ -114,36 +108,33 @@ window.findNQueensSolution = function(boardSize) {
 
     var row = num - numOfTimes;
     for (var col = 0; col < num; col++) {
-      if (board.rows()[row][col] === 0) {
         board.togglePiece(row, col);
-        if (board.hasAnyRowConflicts() || board.hasAnyColConflicts() || board.hasAnyMajorDiagonalConflicts() || board.hasAnyMinorDiagonalConflicts()){
+      if (board.hasRowConflictAt(row) ||
+          board.hasColConflictAt(col) ||
+          board.hasMajorDiagonalConflictAt(col-row) ||
+          board.hasMinorDiagonalConflictAt(col+row)){
+        board.togglePiece(row, col);
+      } else {
+        if (toggle) {
+          search(board, numOfTimes - 1);
           board.togglePiece(row, col);
         } else {
-          if (toggle) {
-            search(board, numOfTimes - 1);
-            board.togglePiece(row, col);
-          } else {
-            return;
-          }
+          return;
         }
       }
     }
   };
 
   search(board, num);
-  console.log(temp);
   return temp;
 };
 
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(boardSize) {
-  //var solutionCount = undefined; //fixme
-//
-  //console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  //return solutionCount;
   var board = new Board({n: boardSize});
   var num = boardSize;
+  var date = new Date();
   var counter = 0;
   if (boardSize === 2 || boardSize === 3){
     return 0;
@@ -156,18 +147,20 @@ window.countNQueensSolutions = function(boardSize) {
 
     var row = num - numOfTimes;
     for (var col = 0; col < num; col++) {
-      if (board.rows()[row][col] === 0) {
+      board.togglePiece(row, col);
+      if (board.hasRowConflictAt(row) ||
+          board.hasColConflictAt(col) ||
+          board.hasMajorDiagonalConflictAt(col-row) ||
+          board.hasMinorDiagonalConflictAt(col+row)){
         board.togglePiece(row, col);
-        if (board.hasAnyRowConflicts() || board.hasAnyColConflicts() || board.hasAnyMajorDiagonalConflicts() || board.hasAnyMinorDiagonalConflicts()){
-          board.togglePiece(row, col);
-        } else {
-          search(board, numOfTimes - 1);
-          board.togglePiece(row, col);
-        }
+      } else {
+        search(board, numOfTimes - 1);
+        board.togglePiece(row, col);
       }
     }
   };
 
   search(board, num);
+  console.log(new Date() - date);
   return counter;
 };
